@@ -36,6 +36,7 @@ pub enum Direction {
     Right,
 }
 
+#[wasm_bindgen]
 impl Universe {
     pub fn new(width: usize, height: usize) -> Self {
         let snake: Vec<CellPosition> = vec![CellPosition { x: 0, y: 0 }];
