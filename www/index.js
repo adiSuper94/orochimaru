@@ -1,4 +1,4 @@
-import { Universe } from "../pkg/orochimaru";
+import { Universe, Direction } from "../pkg/orochimaru";
 import { memory } from "../pkg/orochimaru_bg"
 const WIDTH = 20;
 const HEIGHT = 20;
@@ -85,4 +85,22 @@ const renderLoop = () => {
 
 drawGrid();
 paintSnake(SNAKE_COLOR);
+onkeydown = (e) => {
+  switch (e.key) {
+    case "ArrowDown":
+      universe.set_snake_direction(Direction.Up);
+      break;
+    case "ArrowUp":
+      universe.set_snake_direction(Direction.Down);
+      break;
+    case "ArrowLeft":
+      universe.set_snake_direction(Direction.Left);
+      break;
+    case "ArrowRight":
+      universe.set_snake_direction(Direction.Right);
+      break;
+    default:
+      return;
+  }
+}
 renderLoop();
