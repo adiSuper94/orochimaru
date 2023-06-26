@@ -24,6 +24,7 @@ pub struct Universe {
     height: usize,
     food: HashSet<CellPosition>,
     snake: Vec<CellPosition>,
+    snake_pos: Vec<u32>,
     snake_direction: Direction,
 }
 
@@ -44,6 +45,7 @@ impl Universe {
             width,
             height,
             snake,
+            snake_pos: vec![0, 0],
             food: HashSet::new(),
             snake_direction: Direction::Right,
         }
@@ -61,6 +63,7 @@ impl Universe {
 
         self.snake.remove(self.snake.len() - 1);
         self.snake.insert(0, next_head_position);
+        self.aos2soa();
     }
 
     pub fn set_snake_direction(&mut self, dir: Direction) {
@@ -87,5 +90,22 @@ impl Universe {
             }
         }
         self.snake_direction = dir;
+    }
+
+    pub fn get_snake_len(&self) -> usize {
+        self.snake.len()
+    }
+
+    pub fn get_snake_position(&self) -> *const u32 {
+        self.snake_pos.as_ptr()
+    }
+
+    fn aos2soa(&mut self) {
+        let mut soc: Vec<u32> = Vec::new();
+        for position in self.snake.iter() {
+            soc.push(position.x as u32);
+            soc.push(position.y as u32);
+        }
+        self.snake_pos = soc;
     }
 }

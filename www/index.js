@@ -1,4 +1,5 @@
 import { Universe } from "../pkg/orochimaru";
+import { memory } from "../pkg/orochimaru_bg"
 const WIDTH = 20;
 const HEIGHT = 20;
 const universe = Universe.new(WIDTH, HEIGHT);
@@ -7,6 +8,7 @@ const CELL_SIZE = 20; // px
 const GRID_COLOR = "#CCCCCC";
 const FOOD_COLOR = "#FFFFFF";
 const SNAKE_COLOR = "#000000";
+const EMPTY_COLOR = "#FFFFFF";
 
 // Give the canvas room for all of our cells and a 1px border
 // around each of them.
@@ -40,23 +42,33 @@ const drawGrid = () => {
 const paintCell = (r, c, color) => {
   ctx.fillStyle = color;
   ctx.fillRect(
-    c * (CELL_SIZE + 1) + 1,
     r * (CELL_SIZE + 1) + 1,
+    c * (CELL_SIZE + 1) + 1,
     CELL_SIZE,
     CELL_SIZE
   );
   ctx.stroke();
 }
 
+const paintSnake = (color) => {
+  const snakeLen = universe.get_snake_len();
+  const snakePtr = universe.get_snake_position();
+  const snakeCells = new Uint32Array(memory.buffer, snakePtr, snakeLen * 2);
+  console.log(snakeCells.length);
+  for (let i = 0; i < snakeLen; i++) {
+    let r = snakeCells[i * 2];
+    let c = snakeCells[i * 2 + 1];
+    paintCell(r, c, color);
+  }
+}
 
 const renderLoop = () => {
+  paintSnake(EMPTY_COLOR);
   universe.tick();
-
-  drawGrid();
-
+  paintSnake(SNAKE_COLOR);
   requestAnimationFrame(renderLoop);
 };
 
 drawGrid();
-paintCell(0, 0);
+paintSnake(SNAKE_COLOR);
 requestAnimationFrame(renderLoop);
