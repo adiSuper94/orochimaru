@@ -23,6 +23,7 @@ pub struct Universe {
     width: usize,
     height: usize,
     food: HashSet<CellPosition>,
+    food_pos: Vec<u32>,
     snake: Vec<CellPosition>,
     snake_pos: Vec<u32>,
     snake_direction: Direction,
@@ -47,6 +48,7 @@ impl Universe {
             snake,
             snake_pos: vec![0, 0],
             food: HashSet::new(),
+            food_pos: Vec::new(),
             snake_direction: Direction::Right,
         }
     }
@@ -61,8 +63,13 @@ impl Universe {
         next_head_position.x %= self.width;
         next_head_position.y %= self.height;
 
-        self.snake.remove(self.snake.len() - 1);
+        if !self.food.contains(&next_head_position) {
+            self.snake.remove(self.snake.len() - 1);
+        } else {
+            self.food.remove(&next_head_position);
+        }
         self.snake.insert(0, next_head_position);
+        self.gen_food();
         self.aos2soa();
     }
 
@@ -100,12 +107,39 @@ impl Universe {
         self.snake_pos.as_ptr()
     }
 
-    fn aos2soa(&mut self) {
-        let mut soc: Vec<u32> = Vec::new();
-        for position in self.snake.iter() {
-            soc.push(position.x as u32);
-            soc.push(position.y as u32);
+    pub fn get_food_count(&self) -> usize {
+        self.food.len()
+    }
+
+    pub fn get_food_position(&self) -> *const u32 {
+        self.food_pos.as_ptr()
+    }
+
+    fn gen_food(&mut self) {
+        if self.food.len() > 5 {
+            return;
         }
-        self.snake_pos = soc;
+        if rand::random::<f32>() < 0.1 || self.food.is_empty() {
+            let mut x: usize = rand::random();
+            let mut y: usize = rand::random();
+            x %= self.width;
+            y %= self.height;
+            self.food.insert(CellPosition { x, y });
+        }
+    }
+
+    fn aos2soa(&mut self) {
+        let mut soc_snake: Vec<u32> = Vec::new();
+        for position in self.snake.iter() {
+            soc_snake.push(position.x as u32);
+            soc_snake.push(position.y as u32);
+        }
+        self.snake_pos = soc_snake;
+        let mut soc_food: Vec<u32> = Vec::new();
+        for position in self.food.iter() {
+            soc_food.push(position.x as u32);
+            soc_food.push(position.y as u32);
+        }
+        self.food_pos = soc_food;
     }
 }
