@@ -77,7 +77,10 @@ const paintFood = (color) => {
 const renderLoop = () => {
   paintSnake(EMPTY_COLOR);
   paintFood(EMPTY_COLOR);
-  universe.tick();
+  if (!universe.tick()) {
+    alert("Game Over");
+    return;
+  }
   paintSnake(SNAKE_COLOR);
   paintFood(FOOD_COLOR);
   setTimeout(function() { requestAnimationFrame(renderLoop); }, 1000 / SPEED);

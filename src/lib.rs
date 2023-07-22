@@ -52,7 +52,11 @@ impl Universe {
             snake_direction: Direction::Right,
         }
     }
-    pub fn tick(&mut self) {
+    /**
+     * @brief tick the game state
+     * @return true if the game is still running, false if the game is over
+     */
+    pub fn tick(&mut self) -> bool {
         let mut next_head_position: CellPosition = self.snake[0];
         match &self.snake_direction {
             Direction::Up => next_head_position.y += 1,
@@ -62,7 +66,9 @@ impl Universe {
         }
         next_head_position.x %= self.width;
         next_head_position.y %= self.height;
-
+        if self.snake.contains(&next_head_position) {
+            return false;
+        }
         if !self.food.contains(&next_head_position) {
             self.snake.remove(self.snake.len() - 1);
         } else {
@@ -71,6 +77,7 @@ impl Universe {
         self.snake.insert(0, next_head_position);
         self.gen_food();
         self.aos2soa();
+        return true;
     }
 
     pub fn set_snake_direction(&mut self, dir: Direction) {
